@@ -2,6 +2,9 @@
 
 A minimalist, highly optimized Windows Flip Clock screensaver and desktop application with real-time news integration and rotating productivity quotes. Built with Electron, HTML5, and CSS3.
 
+<img width="1178" height="754" alt="image" src="https://github.com/user-attachments/assets/2980d8cb-e502-4df7-88ed-14496cd9acf1" />
+
+
 ## Features ✨
 - **OLED Dark Mode Design**: Clean, distraction-free matte black interface (`#000000`).
 - **Hardware-Accelerated 3D Flip Clock**: Smooth and realistic CSS 3D transforms (`rotateX`) optimized to run flawlessly with zero DOM allocations per second, ensuring zero lag on startup or runtime.
