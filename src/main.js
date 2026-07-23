@@ -16,6 +16,7 @@ function createWindow(isScreensaver = false) {
     fullscreen: isScreensaver,
     frame: !isScreensaver, // No frame in screensaver
     autoHideMenuBar: true,
+    show: false, // Hide until ready to eliminate black screen
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false, // For simplicity in this local app
@@ -25,6 +26,10 @@ function createWindow(isScreensaver = false) {
 
   mainWindow = new BrowserWindow(windowConfig);
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
 
   if (isScreensaver) {
     mainWindow.setAlwaysOnTop(true, 'screen-saver');
