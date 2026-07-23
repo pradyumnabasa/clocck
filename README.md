@@ -1,7 +1,5 @@
 # CLocck 🕰️
 
-![App Screenshot](screenshot.png)
-
 A minimalist, highly optimized Windows Flip Clock screensaver and desktop application with real-time news integration and rotating productivity quotes. Built with Electron, HTML5, and CSS3.
 
 ## Features ✨
