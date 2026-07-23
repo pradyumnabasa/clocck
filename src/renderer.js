@@ -2,29 +2,44 @@ const { ipcRenderer } = require('electron');
 
 // --- Elements ---
 const dateDisplay = document.getElementById('date-display');
+const quoteDisplay = document.getElementById('quote-display');
 const cardHours = document.getElementById('card-hours');
 const cardMinutes = document.getElementById('card-minutes');
 const cardSeconds = document.getElementById('card-seconds');
-
-const tabClock = document.getElementById('tab-clock');
-const tabPomodoro = document.getElementById('tab-pomodoro');
-const tabTimer = document.getElementById('tab-timer');
-
 const clockContainer = document.getElementById('clock-container');
-const timerContainer = document.getElementById('timer-container');
-const timerDisplay = document.getElementById('timer-display');
-const btnTimerStart = document.getElementById('btn-timer-start');
-const btnTimerReset = document.getElementById('btn-timer-reset');
-
 const overlay = document.getElementById('screensaver-overlay');
 
 // --- State ---
 let clockInterval;
-let timerInterval;
-let currentMode = 'clock'; // 'clock', 'pomodoro', 'timer'
-let timerSeconds = 25 * 60; // default 25 min
-let timerRunning = false;
 let isScreensaver = false;
+
+// --- Funny Quotes Logic ---
+const funnyQuotes = [
+  "\"Procrastination is the art of keeping up with yesterday.\"",
+  "\"I'm not lazy, I'm just on energy-saving mode.\"",
+  "\"I put my phone in airplane mode, but it's not flying.\"",
+  "\"My favorite exercise is a cross between a lunge and a crunch... I call it lunch.\"",
+  "\"I have a lot of growing up to do. I realized that the other day inside my fort.\"",
+  "\"I can resist everything except temptation.\"",
+  "\"I love deadlines. I love the whooshing noise they make as they go by.\"",
+  "\"The only thing standing between you and your goal is the bullshit story you keep telling yourself as to why you can't achieve it.\"",
+  "\"I am so clever that sometimes I don't understand a single word of what I am saying.\"",
+  "\"People say nothing is impossible, but I do nothing every day.\""
+];
+
+function updateQuote() {
+  const randomIndex = Math.floor(Math.random() * funnyQuotes.length);
+  quoteDisplay.style.opacity = 0; // Fade out
+  
+  setTimeout(() => {
+    quoteDisplay.innerText = funnyQuotes[randomIndex];
+    quoteDisplay.style.opacity = 0.9; // Fade in
+  }, 500); // Wait for fade out to complete
+}
+
+// Update quote every 1 minute
+setInterval(updateQuote, 60000);
+updateQuote(); // Initial call
 
 // --- Clock Logic ---
 function formatNumber(num) {
@@ -34,11 +49,6 @@ function formatNumber(num) {
 function updateDate() {
   const now = new Date();
   const options = { day: '2-digit', month: 'short', year: 'numeric', weekday: 'short' };
-  // e.g. "22 Jul 2026 Wed"
-  const dateStr = now.toLocaleDateString('en-GB', options).replace(/,/g, '');
-  
-  // Custom format to match requirement "22 Jul 2026 Wed" exactly if needed.
-  // toLocaleDateString('en-GB') gives "Wed, 22 Jul 2026". We can manually format:
   const day = formatNumber(now.getDate());
   const month = now.toLocaleString('en-US', { month: 'short' });
   const year = now.getFullYear();
@@ -53,7 +63,6 @@ function flip(cardElement, newValue) {
 
   if (currentValue === newValue) return;
 
-  // Set top half to new value immediately for next state, but we cover it with flipper
   const flipperTop = document.createElement('div');
   flipperTop.classList.add('flipper-top');
   flipperTop.innerText = currentValue;
@@ -62,12 +71,11 @@ function flip(cardElement, newValue) {
   flipperBottom.classList.add('flipper-bottom');
   flipperBottom.innerText = newValue;
 
-  topHalf.innerText = newValue; // Update static top to new value (behind flipper)
+  topHalf.innerText = newValue;
 
   cardElement.appendChild(flipperTop);
   cardElement.appendChild(flipperBottom);
 
-  // Clean up flippers after animation (0.5s + 0.5s = 1s total roughly)
   setTimeout(() => {
     bottomHalf.innerText = newValue;
     if(flipperTop.parentNode) flipperTop.remove();
@@ -76,7 +84,6 @@ function flip(cardElement, newValue) {
 }
 
 function updateClock() {
-  if (currentMode !== 'clock') return;
   const now = new Date();
   const h = formatNumber(now.getHours());
   const m = formatNumber(now.getMinutes());
@@ -95,73 +102,6 @@ function startClock() {
     updateClock();
   }, 1000);
 }
-
-// --- Tabs & Modes ---
-function switchMode(mode) {
-  currentMode = mode;
-  tabClock.classList.remove('active');
-  tabPomodoro.classList.remove('active');
-  tabTimer.classList.remove('active');
-
-  clockContainer.style.display = 'none';
-  timerContainer.style.display = 'none';
-
-  if (mode === 'clock') {
-    tabClock.classList.add('active');
-    clockContainer.style.display = 'flex';
-  } else if (mode === 'pomodoro') {
-    tabPomodoro.classList.add('active');
-    timerContainer.style.display = 'flex';
-    timerSeconds = 25 * 60;
-    updateTimerDisplay();
-  } else if (mode === 'timer') {
-    tabTimer.classList.add('active');
-    timerContainer.style.display = 'flex';
-    timerSeconds = 15 * 60; // Default 15 min timer
-    updateTimerDisplay();
-  }
-}
-
-tabClock.addEventListener('click', () => switchMode('clock'));
-tabPomodoro.addEventListener('click', () => switchMode('pomodoro'));
-tabTimer.addEventListener('click', () => switchMode('timer'));
-
-// --- Timer / Pomodoro Logic ---
-function updateTimerDisplay() {
-  const m = formatNumber(Math.floor(timerSeconds / 60));
-  const s = formatNumber(timerSeconds % 60);
-  timerDisplay.innerText = `${m}:${s}`;
-}
-
-btnTimerStart.addEventListener('click', () => {
-  if (timerRunning) {
-    clearInterval(timerInterval);
-    timerRunning = false;
-    btnTimerStart.innerText = 'Start';
-  } else {
-    timerRunning = true;
-    btnTimerStart.innerText = 'Pause';
-    timerInterval = setInterval(() => {
-      if (timerSeconds > 0) {
-        timerSeconds--;
-        updateTimerDisplay();
-      } else {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        btnTimerStart.innerText = 'Start';
-        // Play notification sound here
-      }
-    }, 1000);
-  }
-});
-
-btnTimerReset.addEventListener('click', () => {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  btnTimerStart.innerText = 'Start';
-  timerSeconds = currentMode === 'pomodoro' ? 25 * 60 : 15 * 60;
-  updateTimerDisplay();
-});
 
 // --- Initialization ---
 startClock();
