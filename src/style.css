@@ -162,7 +162,7 @@ body {
   transform-origin: top;
 }
 
-/* Flipper elements created via JS */
+/* Flipper elements pre-rendered */
 .flipper-top, .flipper-bottom {
   position: absolute;
   left: 0;
@@ -172,6 +172,8 @@ body {
   background-color: var(--card-bg);
   z-index: 10;
   transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .flipper-top {
@@ -179,7 +181,7 @@ body {
   border-top-left-radius: var(--card-radius);
   border-top-right-radius: var(--card-radius);
   transform-origin: bottom;
-  animation: flipTop 0.5s ease-in forwards;
+  transform: rotateX(0deg);
 }
 
 .flipper-bottom {
@@ -189,6 +191,13 @@ body {
   line-height: 0;
   transform-origin: top;
   transform: rotateX(90deg);
+}
+
+.is-flipping-top {
+  animation: flipTop 0.5s ease-in forwards;
+}
+
+.is-flipping-bottom {
   animation: flipBottom 0.5s ease-out 0.5s forwards;
 }
 
@@ -211,12 +220,23 @@ body {
   margin-top: 20px;
 }
 
-/* Bottom Controls */
-.bottom-controls {
+/* Bottom News Ticker */
+.news-ticker-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   z-index: 10;
+  min-height: 40px;
+  text-align: center;
+}
+
+.news-text {
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
+  transition: opacity 0.5s ease-in-out;
 }
 
 /* Responsive adjustments */

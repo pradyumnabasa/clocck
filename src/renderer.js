@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 // --- Elements ---
 const dateDisplay = document.getElementById('date-display');
 const quoteDisplay = document.getElementById('quote-display');
+const newsDisplay = document.getElementById('news-display'); // New element
 const cardHours = document.getElementById('card-hours');
 const cardMinutes = document.getElementById('card-minutes');
 const cardSeconds = document.getElementById('card-seconds');
@@ -41,6 +42,32 @@ function updateQuote() {
 setInterval(updateQuote, 60000);
 updateQuote(); // Initial call
 
+// --- News Ticker Logic ---
+const newsHeadlines = [
+  "Tech Giant Unveils Revolutionary AI Assistant",
+  "Global Markets Rally Amidst Economic Recovery Hopes",
+  "Breakthrough in Quantum Computing Achieved by Researchers",
+  "New Sustainable Energy Initiative Launched Worldwide",
+  "Major Update to Popular Operating System Released",
+  "Space Agency Announces Next Mars Rover Mission",
+  "Cybersecurity Experts Warn of Sophisticated Phishing Campaigns",
+  "Electric Vehicle Sales Hit Record Highs This Quarter"
+];
+
+function updateNews() {
+  if (!newsDisplay) return;
+  const randomIndex = Math.floor(Math.random() * newsHeadlines.length);
+  newsDisplay.style.opacity = 0; 
+  
+  setTimeout(() => {
+    newsDisplay.innerText = newsHeadlines[randomIndex];
+    newsDisplay.style.opacity = 0.9; 
+  }, 500);
+}
+
+setInterval(updateNews, 15000); // Update news every 15 seconds
+updateNews();
+
 // --- Clock Logic ---
 function formatNumber(num) {
   return num.toString().padStart(2, '0');
@@ -48,7 +75,6 @@ function formatNumber(num) {
 
 function updateDate() {
   const now = new Date();
-  const options = { day: '2-digit', month: 'short', year: 'numeric', weekday: 'short' };
   const day = formatNumber(now.getDate());
   const month = now.toLocaleString('en-US', { month: 'short' });
   const year = now.getFullYear();
@@ -56,31 +82,40 @@ function updateDate() {
   dateDisplay.innerText = `${day} ${month} ${year} ${weekday}`;
 }
 
+// Optimized flip function - no elements are created or destroyed
 function flip(cardElement, newValue) {
   const topHalf = cardElement.querySelector('.digit-top');
   const bottomHalf = cardElement.querySelector('.digit-bottom');
+  const flipperTop = cardElement.querySelector('.flipper-top');
+  const flipperBottom = cardElement.querySelector('.flipper-bottom');
+  
   const currentValue = topHalf.innerText;
-
   if (currentValue === newValue) return;
 
-  const flipperTop = document.createElement('div');
-  flipperTop.classList.add('flipper-top');
+  // Reset animations
+  flipperTop.classList.remove('is-flipping-top');
+  flipperBottom.classList.remove('is-flipping-bottom');
+
+  // Set values
   flipperTop.innerText = currentValue;
-
-  const flipperBottom = document.createElement('div');
-  flipperBottom.classList.add('flipper-bottom');
   flipperBottom.innerText = newValue;
-
   topHalf.innerText = newValue;
 
-  cardElement.appendChild(flipperTop);
-  cardElement.appendChild(flipperBottom);
+  // Trigger CSS reflow and start animation
+  void flipperTop.offsetWidth;
+  
+  flipperTop.style.display = 'block';
+  flipperBottom.style.display = 'block';
+  flipperTop.classList.add('is-flipping-top');
+  flipperBottom.classList.add('is-flipping-bottom');
 
   setTimeout(() => {
     bottomHalf.innerText = newValue;
-    if(flipperTop.parentNode) flipperTop.remove();
-    if(flipperBottom.parentNode) flipperBottom.remove();
-  }, 1000);
+    flipperTop.style.display = 'none';
+    flipperBottom.style.display = 'none';
+    flipperTop.classList.remove('is-flipping-top');
+    flipperBottom.classList.remove('is-flipping-bottom');
+  }, 950); // Slightly less than 1s to ensure it completes before next tick
 }
 
 function updateClock() {
