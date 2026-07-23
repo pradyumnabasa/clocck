@@ -44,14 +44,14 @@ updateQuote(); // Initial call
 
 // --- News Ticker Logic ---
 const newsHeadlines = [
-  "Tech Giant Unveils Revolutionary AI Assistant",
-  "Global Markets Rally Amidst Economic Recovery Hopes",
-  "Breakthrough in Quantum Computing Achieved by Researchers",
-  "New Sustainable Energy Initiative Launched Worldwide",
-  "Major Update to Popular Operating System Released",
-  "Space Agency Announces Next Mars Rover Mission",
-  "Cybersecurity Experts Warn of Sophisticated Phishing Campaigns",
-  "Electric Vehicle Sales Hit Record Highs This Quarter"
+  "ISRO Successfully Launches New Earth Observation Satellite",
+  "Sensex and Nifty Hit Record Highs Amid Strong Corporate Earnings",
+  "India Becomes the Third Largest Startup Ecosystem Globally",
+  "New High-Speed Vande Bharat Express Trains Introduced",
+  "Major Semiconductor Manufacturing Plant Approved in Gujarat",
+  "UPI Transactions Cross New Milestones in Daily Digital Payments",
+  "Indian Tech Sector to See Massive Hiring Surge in AI Roles",
+  "Government Announces New Policies to Boost Renewable Energy"
 ];
 
 function updateNews() {
